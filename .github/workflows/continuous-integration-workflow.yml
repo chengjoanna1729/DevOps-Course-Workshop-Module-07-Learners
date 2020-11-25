@@ -37,7 +37,7 @@ jobs:
     - name: Run typescript tests
       working-directory: ./DotnetTemplate.Web
       run: npm t
-      
+
     - name: Push to Docker Hub
       uses: docker/build-push-action@v1
       with:
@@ -45,4 +45,14 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: chengjoanna1729/dotnettemplate
         tags: latest,${{ github.sha }}
-      if: ${{ github.ref == 'refs/heads/main' && (steps.dotnet_build.outcome == 'success' || steps.npm_build.outcome == 'success') }}
+      if: ${{ github.ref == 'refs/heads/main' }}
+
+    - name: Deploy to Heroku
+      uses: akhileshns/heroku-deploy@v3.6.8
+      with:
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_app_name: "devops-module-7-joache"
+        heroku_email: "joanna.cheng@softwire.com"
+        usedocker: true
+      if: ${{ github.ref == 'refs/heads/main' }}
+
