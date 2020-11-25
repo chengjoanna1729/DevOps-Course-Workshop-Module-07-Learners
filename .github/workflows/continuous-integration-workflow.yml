@@ -54,5 +54,6 @@ jobs:
         heroku_app_name: "devops-module-7-joache"
         heroku_email: "joanna.cheng@softwire.com"
         usedocker: true
+        healthcheck: "https://devops-module-7-joache.herokuapp.com/health"
       if: ${{ github.ref == 'refs/heads/main' }}
 
