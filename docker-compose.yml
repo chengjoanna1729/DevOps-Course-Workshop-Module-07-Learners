@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+    jenkins-docker:
+        container_name: jenkins-docker
+        image: docker:dind
+        privileged: true
+        networks:
+            jenkins:
+                aliases:
+                    - docker
+        ports:
+            - 2376:2376
+        volumes:
+            - jenkins-docker-certs:/certs/client
+            - jenkins-data:/var/jenkins_home
+        environment:
+            - DOCKER_TLS_CERTDIR=/certs
+
+    jenkins-blueocean:
+        container_name: jenkins-blueocean
+        image: jenkinsci/blueocean
+        networks:
+            - jenkins
+        ports:
+            - 8080:8080
+            - 50000:50000
+        volumes:
+            - jenkins-data:/var/jenkins_home
+            - jenkins-docker-certs:/certs/client:ro
+        environment: 
+            - DOCKER_HOST=tcp://docker:2376
+            - DOCKER_CERT_PATH=/certs/client
+            - DOCKER_TLS_VERIFY=1
+
+networks: 
+    jenkins:
+
+volumes:
+    jenkins-docker-certs:
+    jenkins-data:

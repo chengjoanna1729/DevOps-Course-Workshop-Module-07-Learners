@@ -1,0 +1,48 @@
+name: Continuous Integration
+on: [push]                      # Will make the workflow run every time you push to any branch
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest      # Sets the build environment a machine with the latest Ubuntu installed
+    steps:
+    - name: Check out repository 
+      uses: actions/checkout@v2 # Adds a step to checkout the repository code
+
+    - name: Build C# code
+      id: dotnet_build
+      run: dotnet build 
+
+    - name: Run C# tests
+      run: dotnet test
+
+    - name: Use node 12
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12'
+
+    - name: Run npm install
+      working-directory: ./DotnetTemplate.Web
+      run: npm install
+
+    - name: Build typescript code
+      id: npm_build
+      working-directory: ./DotnetTemplate.Web
+      run: npm run build
+      
+    - name: Run linter
+      working-directory: ./DotnetTemplate.Web
+      run: npm run lint
+      
+    - name: Run typescript tests
+      working-directory: ./DotnetTemplate.Web
+      run: npm t
+
+    - name: Push to Docker Hub
+      uses: docker/build-push-action@v1
+      with:
+        username: chengjoanna1729
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: chengjoanna1729/dotnettemplate
+        tags: latest,${{ github.sha }}
+      if: ${{ github.ref == 'ref/head/main' && (steps.dotnet_build.outcome == 'success' || steps.npm_build.outcome == 'success') }}
