@@ -15,6 +15,11 @@ jobs:
     - name: Run C# tests
       run: dotnet test
 
+    - name: Use node 12
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12'
+
     - name: Run npm install
       working-directory: ./DotnetTemplate.Web
       run: npm install
@@ -31,7 +36,10 @@ jobs:
       working-directory: ./DotnetTemplate.Web
       run: npm t
 
-    - name: Send slack notification
-      uses: rtCamp/action-slack-notify@master
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+    - name: Push to Docker Hub
+      uses: docker/build-push-action@v1
+      with:
+        username: chengjoanna1729
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: chengjoanna1729/dotnettemplate
+        tags: latest,${{ github.sha }}
