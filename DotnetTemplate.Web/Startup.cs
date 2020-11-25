@@ -36,6 +36,11 @@ namespace DotnetTemplate.Web
             app.UseSerilogRequestLogging();
             app.UseRouting();
             app.UseEndpoints(ConfigureEndPointsAsync);
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHealthChecks("/health");
+            });
         }
 
         private static void ConfigureEndPointsAsync(IEndpointRouteBuilder endpoints)
